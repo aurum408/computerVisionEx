@@ -1,14 +1,11 @@
 #include <iostream>
 #include <algorithm>
 #include <cv.hpp>
-#include <string>
 #include <highgui.h>
-#include <map>
 #include <random>
 #include <array>
-#include <math.h>
 #include <fstream>
-#include <iostream>
+
 
 
 
@@ -50,7 +47,7 @@ Mat smoothGrad(Mat img){
         for(int j =1; j< img.cols; j++){
                 u2[j] = (uchar)((u1[j] + u1[j-1] + u1[j+1]
                         + (u1-1)[j] + (u1+1)[j] + (u1-1)[j-1]
-                        + (u1-1)[j+1] + (u1+1)[j-1] + (u1+1)[j+1]) );
+                        + (u1-1)[j+1] + (u1+1)[j-1] + (u1+1)[j+1]) /9 );
         }
 
     }
@@ -77,6 +74,7 @@ vector<pair<unsigned int, int>> sortPixels(vector<Mat> imgs){
     return sortedPixels;
 }
 
+
 void readBMP(string filename){
     static constexpr size_t HEADER_SIZE = 54;
     ifstream bmp(filename, ios::binary);
@@ -94,6 +92,14 @@ void readBMP(string filename){
     cout << "bits per pixel: " << bitPerPixel << endl;
     cout << "amount of colors: " << colors << endl;
     cout << "important colors: " << mainColors << endl;
+}
+Mat depthMap(vector<pair<unsigned int, int>> P){
+    Mat out(600,800, CV_8UC1);
+    uchar* data = out.data;
+    for(int i = 0; i< out.rows * out.cols; i++){
+        data[i] = (uchar)P.at(i).second * 10;
+    }
+    return out;
 }
 
 int main() {
@@ -114,12 +120,15 @@ int main() {
         proData.push_back(img);
     }
 
-    //pixels = sortPixels(proData);
-    //cout << pixels.size();
+    pixels = sortPixels(proData);
+   //cout << inpData.at(0).rows << inpData.at(0).cols;
 
-    String f = "/Users/anastasia/ClionProjects/computerVisionEx/input/1_0001.bmp";
+    Mat test = depthMap(pixels);
+    imshow("test", test);
+    waitKey();
+    //String f = "/Users/anastasia/ClionProjects/computerVisionEx/input/1_0001.bmp";
 
-    readBMP(f);
+   // readBMP(f);
 
 //pair <unsigned int, Mat> grads;
 
